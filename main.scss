@@ -1,0 +1,81 @@
+@use "sass:math";
+@use "sass:string";
+
+$size: 12px;
+$duration: 8s;
+$color: #FFF;
+$max: 100;
+
+// 获取随机数的函数
+@function getRandom($max) {
+  @return math.floor(math.random($max));
+}
+
+// 生成一个阴影的函数
+@function genShadow() {
+  @return '#{getRandom($max)}vw #{getRandom($max)}vh #{$color}';
+}
+
+// 生成阴影的函数
+@function genShadows($n) {
+  $result: '';
+  @for $i from 1 through $n {
+    @if $i == 1 {
+      $result: '#{genShadow()}';
+    }
+    @else {
+      $result: '#{$result}, #{genShadow()}'
+    }
+  }
+  @return string.unquote($result);
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: rgb(0,0,0);
+  background: linear-gradient(0deg, rgba(0,0,0,1) 50%, rgba(51,51,51,1) 100%);
+}
+
+p {
+  font-size: 50px;
+  color: #FFF;
+  text-align: center;
+  margin: 0;
+  padding-top: 40vh;
+}
+
+// 生成layer-*的类
+@for $i from 1 through 5 {
+  .layer#{$i} {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: $size - $i * 3;
+    height: $size - $i * 3;
+    background-color: $color;
+    border-radius: 50%;
+    box-shadow: genShadows(math.floor(math.div(100, $i) * 2)); // 生成很多个阴影
+    animation: moveUp $duration + $i * 1.5 linear infinite;
+
+    &::after {
+      content: '';
+      position: inherit;
+      top: 100vh;
+      left: inherit;
+      background-color: inherit;
+      width: inherit;
+      height: inherit;
+      border-radius: inherit;
+      box-shadow: inherit;
+    }
+  }
+}
+
+@keyframes moveUp {
+  to {
+    transform: translateY(-100vh);
+  }
+}
